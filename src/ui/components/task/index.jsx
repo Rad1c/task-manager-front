@@ -1,4 +1,3 @@
-import React from "react";
 import {
   ButtonContainer,
   Separator,
@@ -10,11 +9,7 @@ import { Button } from "@lanaco/lnc-react-ui";
 import DateRange from "../date-range";
 
 const Task = (props) => {
-  const priority = props.priority;
-  const name = props.name;
-  const description = props.description;
-  const dateOn = props.dateOn;
-  const dateOf = props.dateOf;
+  const { id, priority, name, description, dateOn, dateOf } = props;
 
   return (
     <div>

@@ -5,18 +5,30 @@ import Error from "./ui/Pages/error-page";
 import Story from "./ui/Pages/tasks-page";
 import "./assets/css/fontawesome.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./ui/components/layout";
+import RequireAuth from "./ui/components/require";
+import NonRequireAuth from "./ui/components/non-require";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/stories/:storyId" element={<Story />} />
-        <Route path="/stories" element={<Stories />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        {/*private*/}
+        <Route element={<RequireAuth />}>
+          <Route path="" element={<Stories />} />
+          <Route path="story/:id" element={<Story />} />
+        </Route>
+
+        {/* public */}
+        <Route element={<NonRequireAuth />}>
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+        </Route>
+
+        {/* catch all */}
         <Route path="*" element={<Error />} />
-      </Routes>
-    </Router>
+      </Route>
+    </Routes>
   );
 }
 

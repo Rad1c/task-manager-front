@@ -11,7 +11,8 @@ const Container = styled.div`
   justify-content: center;
   background-image: url(${loginBackgroundImgPath});
   background-repeat: no-repeat;
-  background-position: right top;
+  background-position: center;
+  height: 100vh;
 `;
 
 const ButtonContainer = styled.span`

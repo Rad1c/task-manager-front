@@ -29,6 +29,7 @@ const LinkTo = styled.p`
   color: blue;
   font-size: 0.9rem;
   margin-top: -5px;
+  margin-bottom: -5px;
   cursor: pointer;
 `;
 

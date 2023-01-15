@@ -4,8 +4,17 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { validationRegisterSchema } from "../../../validation/validator";
 import { ErrorValidation } from "../common-styles";
+import axios from "../../../api/axios";
+import { useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
+import ConfirmModal from "../../modals/ConfirmModal";
+
+const REGISTER_URL = "/register";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
+  const modal = useRef();
+  const [registerErr, setRegisterErr] = useState("");
   const {
     register,
     handleSubmit,
@@ -14,51 +23,82 @@ const RegisterForm = () => {
     resolver: yupResolver(validationRegisterSchema),
   });
 
-  const submitForm = (data) => {
-    console.log(data);
+  const submitForm = async (data) => {
+    const { firstName, lastName, email, password, confirmPassword } = data;
+
+    try {
+      const response = await axios.post(
+        REGISTER_URL,
+        JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          passwordConfirm: confirmPassword,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("successed register");
+      modal.current.open();
+    } catch (error) {
+      console.log("register error");
+      setRegisterErr("Registration unsuccessful");
+    }
+  };
+
+  const okModalResponse = () => {
+    modal.current.close();
+    console.log("func");
+    navigate("/login");
   };
 
   return (
-    <Form onSubmit={handleSubmit(submitForm)}>
-      <Label>Register</Label>
-      <ErrorLabel></ErrorLabel>
-      <TextInput
-        name="firstName"
-        style={{ width: "250px" }}
-        placeholder="First name"
-        {...register("firstName")}
-      />
-      <ErrorValidation>{errors.firstName?.message}</ErrorValidation>
-      <TextInput
-        name="lastName"
-        style={{ width: "250px" }}
-        placeholder="Last Name"
-        {...register("lastName")}
-      />
-      <ErrorValidation>{errors.lastName?.message}</ErrorValidation>
-      <TextInput
-        name="email"
-        {...register("email")}
-        style={{ width: "250px" }}
-        placeholder="Email"
-      />
-      <ErrorValidation>{errors.email?.message}</ErrorValidation>
-      <TextInput
-        style={{ width: "250px" }}
-        placeholder="Password"
-        name="password"
-        {...register("password")}
-      />
-      <ErrorValidation>{errors.password?.message}</ErrorValidation>
-      <TextInput
-        style={{ width: "250px" }}
-        placeholder="Confirm password"
-        name="confirmPassword"
-        {...register("confirmPassword")}
-      />
-      <ErrorValidation>{errors.confirmPassword?.message}</ErrorValidation>
-      <Button text="Register" style={{ width: "100%", marginTop: "10px" }} />
-    </Form>
+    <>
+      <ConfirmModal ref={modal} okClicked={okModalResponse} />
+      <Form onSubmit={handleSubmit(submitForm)}>
+        <Label>Register</Label>
+        <ErrorLabel></ErrorLabel>
+        <TextInput
+          name="firstName"
+          style={{ width: "250px" }}
+          placeholder="First name"
+          {...register("firstName")}
+        />
+        <ErrorValidation>{errors.firstName?.message}</ErrorValidation>
+        <TextInput
+          name="lastName"
+          style={{ width: "250px" }}
+          placeholder="Last Name"
+          {...register("lastName")}
+        />
+        <ErrorValidation>{errors.lastName?.message}</ErrorValidation>
+        <TextInput
+          name="email"
+          {...register("email")}
+          style={{ width: "250px" }}
+          placeholder="Email"
+        />
+        <ErrorValidation>{errors.email?.message}</ErrorValidation>
+        <TextInput
+          style={{ width: "250px" }}
+          placeholder="Password"
+          name="password"
+          {...register("password")}
+        />
+        <ErrorValidation>{errors.password?.message}</ErrorValidation>
+        <TextInput
+          style={{ width: "250px" }}
+          placeholder="Confirm password"
+          name="confirmPassword"
+          {...register("confirmPassword")}
+        />
+        <ErrorValidation>{errors.confirmPassword?.message}</ErrorValidation>
+        <Button text="Register" style={{ width: "100%", marginTop: "10px" }} />
+      </Form>
+    </>
   );
 };
 
