@@ -1,9 +1,9 @@
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const RequireAuth = () => {
-  const access = localStorage.getItem("access");
+  const refresh = localStorage.getItem("refresh");
 
-  return access ? <Outlet /> : <Navigate to="/login" />;
+  return !refresh ? <Navigate to="/login" /> : <Outlet />;
 };
 
 export default RequireAuth;

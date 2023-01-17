@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-const NotFoundImgPath = "http://localhost:5173/src/img/not-found.png";
+const NotFoundImgPath = "img/not-found.png";
 
 const ErrorPageContainer = styled.div`
   display: flex;

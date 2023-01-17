@@ -34,4 +34,40 @@ const validationRegisterSchema = Yup.object().shape({
   ),
 });
 
-export { validationLoginSchema, validationRegisterSchema };
+const validateStorySchema = Yup.object().shape({
+  name: Yup.string()
+    .max(55, "Max lenght is 55 chars")
+    .required("Story name is required"),
+  status: Yup.mixed()
+    .oneOf(["New", "Active", "Resolved", "Closed"])
+    .required("Story status is required"),
+  priority: Yup.mixed()
+    .oneOf(["Low", "Medium", "High"])
+    .required("Story priority is required"),
+  description: Yup.string().max(250, "Max lenght is 250 chars"),
+});
+
+const validateTaskSchema = Yup.object().shape({
+  name: Yup.string()
+    .max(55, "Max lenght is 55 chars")
+    .required("Story name is required"),
+  dateOn: Yup.date().required("start date is required"),
+  dateOf: Yup.date().min(
+    Yup.ref("dateOn"),
+    "end date can't be before start date"
+  ),
+  status: Yup.mixed()
+    .oneOf(["New", "Active", "Resolved", "Closed"])
+    .required("story status is required"),
+  priority: Yup.mixed()
+    .oneOf(["Low", "Medium", "High"])
+    .required("story priority is required"),
+  description: Yup.string().max(250, "Max lenght is 250 chars"),
+});
+
+export {
+  validationLoginSchema,
+  validationRegisterSchema,
+  validateStorySchema,
+  validateTaskSchema,
+};

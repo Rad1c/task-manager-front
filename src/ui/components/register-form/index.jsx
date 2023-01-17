@@ -8,6 +8,7 @@ import axios from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import ConfirmModal from "../../modals/ConfirmModal";
+import { motion } from "framer-motion";
 
 const REGISTER_URL = "/register";
 
@@ -51,53 +52,62 @@ const RegisterForm = () => {
 
   const okModalResponse = () => {
     modal.current.close();
-    console.log("func");
+
     navigate("/login");
   };
 
   return (
     <>
       <ConfirmModal ref={modal} okClicked={okModalResponse} />
-      <Form onSubmit={handleSubmit(submitForm)}>
-        <Label>Register</Label>
-        <ErrorLabel></ErrorLabel>
-        <TextInput
-          name="firstName"
-          style={{ width: "250px" }}
-          placeholder="First name"
-          {...register("firstName")}
-        />
-        <ErrorValidation>{errors.firstName?.message}</ErrorValidation>
-        <TextInput
-          name="lastName"
-          style={{ width: "250px" }}
-          placeholder="Last Name"
-          {...register("lastName")}
-        />
-        <ErrorValidation>{errors.lastName?.message}</ErrorValidation>
-        <TextInput
-          name="email"
-          {...register("email")}
-          style={{ width: "250px" }}
-          placeholder="Email"
-        />
-        <ErrorValidation>{errors.email?.message}</ErrorValidation>
-        <TextInput
-          style={{ width: "250px" }}
-          placeholder="Password"
-          name="password"
-          {...register("password")}
-        />
-        <ErrorValidation>{errors.password?.message}</ErrorValidation>
-        <TextInput
-          style={{ width: "250px" }}
-          placeholder="Confirm password"
-          name="confirmPassword"
-          {...register("confirmPassword")}
-        />
-        <ErrorValidation>{errors.confirmPassword?.message}</ErrorValidation>
-        <Button text="Register" style={{ width: "100%", marginTop: "10px" }} />
-      </Form>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <Form onSubmit={handleSubmit(submitForm)}>
+          <Label>Register</Label>
+          <ErrorLabel></ErrorLabel>
+          <TextInput
+            name="firstName"
+            style={{ width: "250px" }}
+            placeholder="First name"
+            {...register("firstName")}
+          />
+          <ErrorValidation>{errors.firstName?.message}</ErrorValidation>
+          <TextInput
+            name="lastName"
+            style={{ width: "250px" }}
+            placeholder="Last Name"
+            {...register("lastName")}
+          />
+          <ErrorValidation>{errors.lastName?.message}</ErrorValidation>
+          <TextInput
+            name="email"
+            {...register("email")}
+            style={{ width: "250px" }}
+            placeholder="Email"
+          />
+          <ErrorValidation>{errors.email?.message}</ErrorValidation>
+          <TextInput
+            style={{ width: "250px" }}
+            placeholder="Password"
+            name="password"
+            {...register("password")}
+          />
+          <ErrorValidation>{errors.password?.message}</ErrorValidation>
+          <TextInput
+            style={{ width: "250px" }}
+            placeholder="Confirm password"
+            name="confirmPassword"
+            {...register("confirmPassword")}
+          />
+          <ErrorValidation>{errors.confirmPassword?.message}</ErrorValidation>
+          <Button
+            text="Register"
+            style={{ width: "100%", marginTop: "10px" }}
+          />
+        </Form>
+      </motion.div>
     </>
   );
 };

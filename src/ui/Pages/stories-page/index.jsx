@@ -1,12 +1,16 @@
 import { StoryHeader } from "./styled";
-import { Kanban, Button, Modal } from "@lanaco/lnc-react-ui";
+import { motion } from "framer-motion";
 import Story from "../../components/story/";
 import { Headerdiv, StoriesContainer } from "../../components/common-styles";
 import useStoriesStore from "../../../store/storiesStore";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
-import useTaskStore from "../../../store/tasksStore";
 import CreateEditStoryModal from "../../modals/CreateEditStoryModal";
+import {
+  Kanban,
+  Button,
+  notification,
+  NotificationMessage,
+} from "@lanaco/lnc-react-ui";
 
 const columns = [
   {
@@ -28,8 +32,15 @@ const columns = [
 ];
 
 const Stories = () => {
-  const { getStories, stories, status, deleteStory } = useStoriesStore();
-  const navigate = useNavigate();
+  const {
+    getStories,
+    stories,
+    status,
+    deleteStory,
+    getTasksByStoryId,
+    createStory,
+    updateStory,
+  } = useStoriesStore();
   const createStoryModalRef = useRef();
 
   const dataArr = {
@@ -43,24 +54,47 @@ const Stories = () => {
     getStories();
   }, []);
 
-  /*if (
-    status === 400 &&
-    localStorage.getItem("access") &&
-    localStorage.getItem("refresh")
-  ) {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    navigate("/login");
-  }
-  */
-  const deleteStoryHandler = (id) => {
-    /*if (tasks.length === 0) deleteStory(id);
-    else console.log("greska");*/
-    deleteStory(id);
+  const deleteStoryHandler = async (id) => {
+    const response = await getTasksByStoryId(id);
+    console.log(response);
+
+    if (response.tasks.length === 0) {
+      deleteStory(id);
+      notifySuccess("Story is succesful deleted.");
+    } else {
+      notifyError("Story has tasks. First delete tasks!");
+    }
   };
 
   const createStoryHandler = (data) => {
-    console.log(data);
+    createStory(data);
+    createStoryModalRef.current.close();
+    notifySuccess("Story is succesful created.");
+  };
+
+  const updateStoryHandler = (data) => {
+    updateStory(data);
+    notifySuccess("Story is succesful updated.");
+  };
+
+  const notifySuccess = (message, title = "Success") => {
+    console.log(message, title);
+    notification.success(
+      <NotificationMessage title={title}>{message}</NotificationMessage>
+    );
+  };
+
+  const notifyError = (message, title = "Error") => {
+    console.log(message, title);
+    notification.error(
+      <NotificationMessage title={title}>{message}</NotificationMessage>
+    );
+  };
+
+  const cardMoved = (e, items, column) => {
+    console.log(e);
+    console.log(itme);
+    console.log(column);
   };
 
   stories.map((story) => {
@@ -77,19 +111,39 @@ const Stories = () => {
             name={name}
             id={id}
             deleteStory={deleteStoryHandler}
+            updateStory={updateStoryHandler}
           />
         ),
       });
     }
   });
 
+  const containerVariants = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: { delay: 0.2, duration: 0.2 },
+    },
+    exit: {
+      transition: { ease: "easeInOut" },
+    },
+  };
+
   return (
-    <>
+    <motion.div
+      className="home container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
       <CreateEditStoryModal
         ref={createStoryModalRef}
         title="Create Story"
         cancel={() => createStoryModalRef.current.close()}
-        save={createStoryHandler}
+        create={createStoryHandler}
       />
       <StoryHeader>
         <Headerdiv>Stories</Headerdiv>
@@ -101,14 +155,14 @@ const Stories = () => {
       </StoryHeader>
       <StoriesContainer>
         <Kanban
+          // onCardMoved={cardMoved}
           style={{ width: "100%" }}
           horizontalDisplay={true}
-          handle={false}
           data={dataArr}
           columns={columns}
         />
       </StoriesContainer>
-    </>
+    </motion.div>
   );
 };
 

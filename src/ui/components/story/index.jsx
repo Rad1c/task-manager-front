@@ -1,62 +1,54 @@
 import { StoryContainer, TitleSeparator } from "./styled";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@lanaco/lnc-react-ui";
+import YesNoModal from "../../modals/YesNoModal";
+import { useRef } from "react";
+import CreateEditStoryModal from "../../modals/CreateEditStoryModal";
 import {
   ButtonContainer,
   ContentStoryDiv,
   ContentSeparator,
   PriorityDiv,
 } from "../common-styles";
-import YesNoModal from "../../modals/YesNoModal";
-import { useRef } from "react";
-import useStoriesStore from "../../../store/storiesStore";
-import CreateEditStoryModal from "../../modals/CreateEditStoryModal";
 
 const Story = (props) => {
-  const { priority, status, name, description, id, deleteStory } = props;
+  const { priority, status, name, description, id, deleteStory, updateStory } =
+    props;
   const navigate = useNavigate();
   const deleteStoryModal = useRef();
   const editStoryModal = useRef();
 
-  const deleteHandler = () => {
-    deleteStoryModal.current.open();
-  };
-
-  const editstoryHandler = () => {
-    editStoryModal.current.open();
-  };
-
-  const yesClicked = () => {
+  const deleteStoryHandler = () => {
     deleteStory(id);
+
     deleteStoryModal.current.close();
   };
 
-  const noClicked = () => {
-    deleteStoryModal.current.close();
-  };
+  const onSaveUpdateHandler = (data) => {
+    updateStory({ ...data, id });
 
-  const cancelClicked = () => {
     editStoryModal.current.close();
   };
 
   return (
     <StoryContainer>
       <CreateEditStoryModal
-        cancel={cancelClicked}
+        cancel={() => editStoryModal.current.close()}
         ref={editStoryModal}
         title="Edit Story"
         name={name}
         priority={priority}
         description={description}
         status={status}
+        update={onSaveUpdateHandler}
       />
       <YesNoModal
         ref={deleteStoryModal}
         storyName={name}
-        yesClicked={yesClicked}
-        noClicked={noClicked}
+        yesClicked={deleteStoryHandler}
+        noClicked={() => deleteStoryModal.current.close()}
         title={"Delete Story"}
-        description={`Are you sure to want delete to '${name}'`}
+        description={`Are you sure to want delete story '${name}'`}
       />
       <h3
         onClick={() => navigate(`/story/${id}`)}
@@ -71,12 +63,12 @@ const Story = (props) => {
       <ButtonContainer>
         <Button
           color="danger"
-          onClick={deleteHandler}
+          onClick={() => deleteStoryModal.current.open()}
           text="x"
           style={{ marginTop: "10px" }}
         />
         <Button
-          onClick={editstoryHandler}
+          onClick={() => editStoryModal.current.open()}
           color="success"
           text="Detail"
           style={{ marginTop: "10px" }}

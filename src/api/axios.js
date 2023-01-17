@@ -29,7 +29,9 @@ axiosPrivate.interceptors.response.use(
     const prevReq = err?.config;
     if (err?.response?.status === 401 && !prevReq?.sent) {
       prevReq.sent = true;
+
       const { data: newAccessToken } = await refresh();
+
       prevReq.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
       return axiosPrivate(prevReq);

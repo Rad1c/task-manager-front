@@ -1,16 +1,54 @@
 import {
   ConfirmationForm,
-  DropdownLookup,
+  Dropdown,
   TextAreaInput,
   TextInput,
 } from "@lanaco/lnc-react-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@lanaco/lnc-react-ui";
+import priorityOptions from "../../enums/priorityOptionsEnum";
+import statusOptions from "../../enums/statusOptionsEnum";
+import { validateStorySchema } from "../../validation/validator";
+import { ErrorValidation } from "../components/common-styles";
 
 const CreateEditStoryModal = React.forwardRef((props, ref) => {
-  const { title, cancel, save } = props;
-  const [name, setName] = useState(props.name || "");
-  console.log("renerovan modal za dodavanje storija");
+  const [createEditError, setCreateEditError] = useState();
+  const { title, cancel, create, status, priority, description, name, update } =
+    props;
+  const formValuesRef = useRef({
+    newStatus: status || statusOptions[0].value,
+    newPriority: priority || priorityOptions[0].value,
+    newName: name,
+    newDescription: description,
+  });
+
+  const onSaveHandler = async () => {
+    const { newStatus, newPriority, newName, newDescription } =
+      formValuesRef.current;
+
+    const data = {
+      name: newName,
+      status: newStatus,
+      priority: newPriority,
+      description: newDescription,
+    };
+
+    try {
+      await validateStorySchema.validate(data);
+
+      if (create) {
+        create(data);
+      }
+
+      if (update) {
+        update(data);
+      }
+      setCreateEditError("");
+    } catch (err) {
+      setCreateEditError(err.errors);
+    }
+  };
+
   return (
     <ConfirmationForm
       ref={ref}
@@ -18,41 +56,42 @@ const CreateEditStoryModal = React.forwardRef((props, ref) => {
       actionsAlignment={"center"}
       actions={
         <>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <ErrorValidation>{createEditError}</ErrorValidation>
+          </div>
           <TextInput
-            onChange={(e) => setName(e.target.value)}
             placeholder="Name"
             value={name}
+            onChange={(e) => (formValuesRef.current.newName = e.target.value)}
           />
-          <DropdownLookup size="small" />
-          <DropdownLookup
+          <Dropdown
             size="small"
-            defaultInputValue="1"
-            options={[
-              {
-                value: "1",
-                label: "option 1",
-              },
-              {
-                value: "2",
-                label: "option 2",
-              },
-              {
-                value: "3",
-                label: "option 3",
-              },
-            ]}
+            options={priorityOptions}
+            defaultInputValue={priority || priorityOptions[0].value}
+            onChange={(e) => (formValuesRef.current.newPriority = e.value)}
+          />
+          <Dropdown
+            size="small"
+            options={status ? statusOptions : [statusOptions[0]]}
+            defaultInputValue={status || statusOptions[0].value}
+            onChange={(e) => (formValuesRef.current.newStatus = e.value)}
           />
           <TextAreaInput
-            minRows={6}
-            maxRows={8}
-            style={{ width: "280px" }}
-            value={props.description || ""}
+            minRows={8}
+            maxRows={12}
+            style={{ width: "350px" }}
+            value={description}
+            onChange={(e) =>
+              (formValuesRef.current.newDescription = e.target.value)
+            }
           />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button color="danger" onClick={cancel}>
               Cancel
             </Button>
-            <Button color="success">Save</Button>
+            <Button color="success" onClick={onSaveHandler}>
+              Save
+            </Button>
           </div>
         </>
       }

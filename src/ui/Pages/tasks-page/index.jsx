@@ -1,11 +1,17 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { StoryHeader } from "../stories-page/styled";
-import { Button, Kanban } from "@lanaco/lnc-react-ui";
+import {
+  Button,
+  Kanban,
+  notification,
+  NotificationMessage,
+} from "@lanaco/lnc-react-ui";
 import { Headerdiv, StoriesContainer } from "../../components/common-styles";
 import Task from "../../components/task";
 import { useEffect, useRef } from "react";
 import useTaskStore from "../../../store/tasksStore";
-import CreateEditTaskModal from "../../modals/CreateEditStoryModal";
+import CreateEditTaskModal from "../../modals/CreateEditTaskModal";
+import { motion } from "framer-motion";
 
 const columns = [
   {
@@ -27,7 +33,15 @@ const columns = [
 ];
 
 const Story = () => {
-  const { tasks, getTasks, storyName, status } = useTaskStore();
+  const {
+    tasks,
+    getTasks,
+    storyName,
+    status,
+    createTask,
+    deleteTask,
+    updateTask,
+  } = useTaskStore();
   const navigate = useNavigate();
   let { id } = useParams();
   const createTaskModalRef = useRef();
@@ -43,15 +57,28 @@ const Story = () => {
     getTasks(id);
   }, []);
 
-  if (
-    status === 400 &&
-    localStorage.getItem("access") &&
-    localStorage.getItem("refresh")
-  ) {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    navigate("/login");
-  }
+  const deleteTaskHandler = (id) => {
+    deleteTask(id);
+    notifySuccess("Task is succesful deleted.");
+  };
+
+  const createTaskHandler = (data) => {
+    createTask(data);
+    createTaskModalRef.current.close();
+    notifySuccess("Task is succesful created.");
+  };
+
+  const updateTaskHandler = (data) => {
+    updateTask(data);
+    notifySuccess("Task is succesful updated.");
+  };
+
+  const notifySuccess = (message, title = "Success") => {
+    console.log(message, title);
+    notification.success(
+      <NotificationMessage title={title}>{message}</NotificationMessage>
+    );
+  };
 
   if (tasks) {
     tasks.map((task) => {
@@ -79,6 +106,9 @@ const Story = () => {
               storyId={storyId}
               dateOn={dateOn}
               dateOf={dateOf}
+              status={status}
+              deleteTask={deleteTaskHandler}
+              updateTask={updateTaskHandler}
             />
           ),
         });
@@ -86,11 +116,32 @@ const Story = () => {
     });
   }
 
+  const containerVariants = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: { delay: 0.2, duration: 0.2 },
+    },
+    exit: {
+      transition: { ease: "easeInOut" },
+    },
+  };
   return (
-    <>
+    <motion.div
+      className="home container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
       <CreateEditTaskModal
         cancel={() => createTaskModalRef.current.close()}
         ref={createTaskModalRef}
+        create={createTaskHandler}
+        title="Create Task"
+        storyId={id}
       />
       <StoryHeader>
         <Headerdiv>{tasks && storyName}</Headerdiv>
@@ -104,12 +155,11 @@ const Story = () => {
         <Kanban
           style={{ width: "100%" }}
           horizontalDisplay={true}
-          handle={false}
           data={dataArr}
           columns={columns}
         ></Kanban>
       </StoriesContainer>
-    </>
+    </motion.div>
   );
 };
 
