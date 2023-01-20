@@ -1,15 +1,17 @@
+import i18next from "../localization/i18n";
+
 const priorityOptions = [
   {
     value: "Low",
-    label: "Low",
+    label: i18next.t("low"),
   },
   {
     value: "Medium",
-    label: "Medium",
+    label: i18next.t("medium"),
   },
   {
     value: "High",
-    label: "High",
+    label: i18next.t("high"),
   },
 ];
 

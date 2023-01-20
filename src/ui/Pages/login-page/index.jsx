@@ -3,9 +3,11 @@ import LoginContainer from "./styled";
 
 const Login = () => {
   return (
-    <LoginContainer>
-      <LoginForm />
-    </LoginContainer>
+    <>
+      <LoginContainer>
+        <LoginForm />
+      </LoginContainer>
+    </>
   );
 };
 

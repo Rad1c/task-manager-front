@@ -5,12 +5,10 @@ import { Headerdiv, StoriesContainer } from "../../components/common-styles";
 import useStoriesStore from "../../../store/storiesStore";
 import { useEffect, useRef, useState } from "react";
 import CreateEditStoryModal from "../../modals/CreateEditStoryModal";
-import {
-  Kanban,
-  Button,
-  notification,
-  NotificationMessage,
-} from "@lanaco/lnc-react-ui";
+import { Kanban, Button, notification, NotificationMessage, Dropdown } from "@lanaco/lnc-react-ui";
+import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import Logout from "../../components/logout";
 
 const columns = [
   {
@@ -32,6 +30,7 @@ const columns = [
 ];
 
 const Stories = () => {
+  const { t } = useTranslation();
   const {
     getStories,
     stories,
@@ -40,8 +39,10 @@ const Stories = () => {
     getTasksByStoryId,
     createStory,
     updateStory,
+    updateStoryStatus,
   } = useStoriesStore();
   const createStoryModalRef = useRef();
+  const navigate = useNavigate();
 
   const dataArr = {
     New: [],
@@ -54,47 +55,43 @@ const Stories = () => {
     getStories();
   }, []);
 
+  useEffect(() => {
+    if (status === 404) {
+      navigate("/not-found", { replace: true });
+    }
+
+    if (status === 401) {
+      navigate("/login");
+    }
+  }, [status]);
+
   const deleteStoryHandler = async (id) => {
     const response = await getTasksByStoryId(id);
-    console.log(response);
 
     if (response.tasks.length === 0) {
-      deleteStory(id);
-      notifySuccess("Story is succesful deleted.");
+      deleteStory(id).then(() => notifySuccess(t("deleteStorySuccess")));
     } else {
-      notifyError("Story has tasks. First delete tasks!");
+      notifyError(t("storyHasTasks"));
     }
   };
 
   const createStoryHandler = (data) => {
-    createStory(data);
+    createStory(data).then(() => notifySuccess(t("createStorySuccess")));
     createStoryModalRef.current.close();
-    notifySuccess("Story is succesful created.");
   };
 
   const updateStoryHandler = (data) => {
-    updateStory(data);
-    notifySuccess("Story is succesful updated.");
+    updateStory(data).then(() => notifySuccess(t("updateStorySuccess")));
   };
 
-  const notifySuccess = (message, title = "Success") => {
+  const notifySuccess = (message, title = t("success")) => {
     console.log(message, title);
-    notification.success(
-      <NotificationMessage title={title}>{message}</NotificationMessage>
-    );
+    notification.success(<NotificationMessage title={title}>{message}</NotificationMessage>);
   };
 
-  const notifyError = (message, title = "Error") => {
+  const notifyError = (message, title = t("error")) => {
     console.log(message, title);
-    notification.error(
-      <NotificationMessage title={title}>{message}</NotificationMessage>
-    );
-  };
-
-  const cardMoved = (e, items, column) => {
-    console.log(e);
-    console.log(itme);
-    console.log(column);
+    notification.error(<NotificationMessage title={title}>{message}</NotificationMessage>);
   };
 
   stories.map((story) => {
@@ -131,21 +128,23 @@ const Stories = () => {
     },
   };
 
+  const cardMoved = (event, items, status, previousColumn) => {
+    if (status) {
+      const story = items[`${status}`].at(items[`${status}`].length - 1);
+      updateStoryStatus(status, story.id);
+    }
+  };
+
   return (
-    <motion.div
-      className="home container"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
+    <>
       <CreateEditStoryModal
         ref={createStoryModalRef}
-        title="Create Story"
+        title={t("createStory")}
         cancel={() => createStoryModalRef.current.close()}
         create={createStoryHandler}
       />
       <StoryHeader>
+        <Logout />
         <Headerdiv>Stories</Headerdiv>
         <Button
           style={{ marginLeft: "5px", padding: "22px", fontSize: "1.25rem" }}
@@ -153,16 +152,24 @@ const Stories = () => {
           onClick={() => createStoryModalRef.current.open()}
         />
       </StoryHeader>
-      <StoriesContainer>
-        <Kanban
-          // onCardMoved={cardMoved}
-          style={{ width: "100%" }}
-          horizontalDisplay={true}
-          data={dataArr}
-          columns={columns}
-        />
-      </StoriesContainer>
-    </motion.div>
+      <motion.div
+        className="home container"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
+        <StoriesContainer>
+          <Kanban
+            onCardChangedColumns={cardMoved}
+            style={{ width: "100%" }}
+            horizontalDisplay={true}
+            data={dataArr}
+            columns={columns}
+          />
+        </StoriesContainer>
+      </motion.div>
+    </>
   );
 };
 

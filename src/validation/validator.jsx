@@ -1,73 +1,41 @@
 import * as Yup from "yup";
+import i18next from "../localization/i18n";
+
+const t = (t) => {
+  i18next.t(t);
+};
 
 const validationLoginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("invalid email Address")
-    .required("email is required"),
+  email: Yup.string().email(t("invalidEmail")).required(t("requiredEmail")),
 
-  password: Yup.string()
-    .min(4, "min length is 4 chars")
-    .max(15, "max lenght is 15 chars")
-    .required("password is required"),
+  password: Yup.string().min(4, t("pwMin")).max(15, t("pwMax")).required(t("pwReq")),
 });
 
 const validationRegisterSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .min(3, "min length is 3 chars")
-    .max(55, "max lenght is 55 chars")
-    .required("first name is required"),
-  lastName: Yup.string()
-    .min(3, "min length is 3 chars")
-    .max(55, "max lenght is 55 chars")
-    .required("last name is required"),
-  email: Yup.string()
-    .email("invalid email Address")
-    .required("email is required"),
+  firstName: Yup.string().min(3, t("fnMin")).max(55, t("fnMax")).required(t("fnReq")),
+  lastName: Yup.string().min(3, t("lnMin")).max(55, t("lnMax")).required(t("lnReq")),
+  email: Yup.string().email(t("invalidEmail")).required(t("requiredEmail")),
 
-  password: Yup.string()
-    .min(4, "min length is 4 chars")
-    .max(15, "max lenght is 15 chars")
-    .required("password is required"),
-  confirmPassword: Yup.string().oneOf(
-    [Yup.ref("password"), null],
-    "Passwords must match"
-  ),
+  password: Yup.string().min(4, t("pwMin")).max(15, t("pwMax")).required(t("pwReq")),
+  confirmPassword: Yup.string().oneOf([Yup.ref("password"), null], t("pwMatch")),
 });
 
 const validateStorySchema = Yup.object().shape({
-  name: Yup.string()
-    .max(55, "Max lenght is 55 chars")
-    .required("Story name is required"),
-  status: Yup.mixed()
-    .oneOf(["New", "Active", "Resolved", "Closed"])
-    .required("Story status is required"),
-  priority: Yup.mixed()
-    .oneOf(["Low", "Medium", "High"])
-    .required("Story priority is required"),
-  description: Yup.string().max(250, "Max lenght is 250 chars"),
+  name: Yup.string().max(55, t("nameMax")).required(t("storyNameReq")),
+  status: Yup.mixed().oneOf(["New", "Active", "Resolved", "Closed"]).required(t("storyStatusReq")),
+  priority: Yup.mixed().oneOf(["Low", "Medium", "High"]).required(t("storyPriorReq")),
+  description: Yup.string().max(250, t("description")),
 });
 
 const validateTaskSchema = Yup.object().shape({
-  name: Yup.string()
-    .max(55, "Max lenght is 55 chars")
-    .required("Story name is required"),
-  dateOn: Yup.date().required("start date is required"),
-  dateOf: Yup.date().min(
-    Yup.ref("dateOn"),
-    "end date can't be before start date"
-  ),
-  status: Yup.mixed()
+  name: Yup.string().max(55, t("nameMax")).required(t("storyNameReq")),
+  dateOn: Yup.date().required(),
+  dateOf: Yup.date().min(Yup.ref("dateOn"), t("dateOfErr")),
+  status: Yup.mixed(t("dateOnReq"))
     .oneOf(["New", "Active", "Resolved", "Closed"])
-    .required("story status is required"),
-  priority: Yup.mixed()
-    .oneOf(["Low", "Medium", "High"])
-    .required("story priority is required"),
-  description: Yup.string().max(250, "Max lenght is 250 chars"),
+    .required(t("taskStatusReq")),
+  priority: Yup.mixed().oneOf(["Low", "Medium", "High"]).required(t("taskPriorReq")),
+  description: Yup.string().max(250, t("description")),
 });
 
-export {
-  validationLoginSchema,
-  validationRegisterSchema,
-  validateStorySchema,
-  validateTaskSchema,
-};
+export { validationLoginSchema, validationRegisterSchema, validateStorySchema, validateTaskSchema };

@@ -37,7 +37,7 @@ axiosPrivate.interceptors.response.use(
       return axiosPrivate(prevReq);
     }
 
-    return Promise.reject(err);
+    throw err;
   }
 );
 

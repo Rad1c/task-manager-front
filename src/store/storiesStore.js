@@ -12,7 +12,7 @@ const useStoriesStore = create((set, get) => ({
       set({ stories: response.data });
       set({ status: response.status });
     } catch (error) {
-      set({ status: 401 });
+      set({ status: error?.response?.status });
     }
   },
   getTasksByStoryId: async (id) => {
@@ -28,15 +28,14 @@ const useStoriesStore = create((set, get) => ({
 
       set({ status: response.status });
     } catch (error) {
-      //set({ status: { value: 400, trigger: !status.trigger } });
-      set({ status: 400 });
+      set({ status: error?.response?.status });
     }
   },
   createStory: async (data) => {
     const { name, status, priority, description } = data;
 
     try {
-      await axiosPrivate.post(
+      const response = await axiosPrivate.post(
         "story",
         JSON.stringify({ name, status, priority, description }),
         {
@@ -44,9 +43,12 @@ const useStoriesStore = create((set, get) => ({
         }
       );
 
+      set({ status: response.status });
+
       get().getStories();
+      set({ status: response?.status });
     } catch (error) {
-      set({ status: 400 });
+      set({ status: error?.response?.status });
     }
   },
   updateStory: async (data) => {
@@ -61,9 +63,55 @@ const useStoriesStore = create((set, get) => ({
         }
       );
 
-      get().getStories();
+      const stories = get().stories;
+
+      stories.map((story) => {
+        if (story.id === id) {
+          story.name = name;
+          story.status = status;
+          story.priority = priority;
+          story.description = description;
+          return story;
+        }
+      });
+
+      set({ stories });
+      set({ status: response?.status });
     } catch (error) {
-      set({ status: 400 });
+      set({ status: error?.response?.status });
+    }
+  },
+  updateStoryStatus: async (status, id) => {
+    const stories = get().stories;
+
+    const story = stories.find((x) => x.id === id);
+
+    stories.map((story) => {
+      if (story.id == id) {
+        story.status = status;
+        return story;
+      }
+    });
+
+    set({ stories });
+
+    try {
+      const response = await axiosPrivate.put(
+        `story/${id}`,
+        JSON.stringify({
+          name: story.name,
+          description: story.description,
+          priority: story.priority,
+          status: story.status,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      set({ status: response?.status });
+    } catch (error) {
+      set({ status: error?.response?.status });
     }
   },
 }));

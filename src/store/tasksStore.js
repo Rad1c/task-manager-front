@@ -13,17 +13,15 @@ const useTaskStore = create((set, get) => ({
       set({ storyName: response.data.storyName });
       set({ status: response.status });
     } catch (error) {
-      set({ status: 400 });
-      console.log(error);
+      set({ status: error?.response?.status });
     }
   },
 
   createTask: async (data) => {
-    const { name, dateOn, dateOf, status, priority, description, storyId } =
-      data;
+    const { name, dateOn, dateOf, status, priority, description, storyId } = data;
 
     try {
-      await axiosPrivate.post(
+      const response = await axiosPrivate.post(
         "task",
         JSON.stringify({
           name,
@@ -39,9 +37,10 @@ const useTaskStore = create((set, get) => ({
         }
       );
 
+      set({ status: response.status });
       get().getTasks(storyId);
     } catch (error) {
-      set({ status: 400 });
+      set({ status: error?.response?.status });
     }
   },
   deleteTask: async (id) => {
@@ -52,16 +51,14 @@ const useTaskStore = create((set, get) => ({
 
       set({ status: response.status });
     } catch (error) {
-      //set({ status: { value: 400, trigger: !status.trigger } });
-      set({ status: 400 });
+      set({ status: error?.response?.status });
     }
   },
   updateTask: async (data) => {
-    const { name, status, priority, description, id, storyId, dateOn, dateOf } =
-      data;
+    const { name, status, priority, description, id, storyId, dateOn, dateOf } = data;
 
     try {
-      await axiosPrivate.put(
+      const response = await axiosPrivate.put(
         `task/${id}`,
         JSON.stringify({ name, description, priority, status, dateOn, dateOf }),
         {
@@ -69,9 +66,62 @@ const useTaskStore = create((set, get) => ({
         }
       );
 
-      get().getTasks(storyId);
+      const tasks = get().tasks;
+
+      tasks.map((task) => {
+        if (task.id == id) {
+          task.name = name;
+          task.status = status;
+          task.priority = priority;
+          task.description = description;
+          task.dateOf = dateOf;
+          task.dateOn = dateOn;
+
+          return task;
+        }
+      });
+
+      set({ tasks });
+      set({ status: response?.status });
     } catch (error) {
-      set({ status: 400 });
+      set({ status: error?.response?.status });
+    }
+  },
+  updateTaskStatus: async (status, id) => {
+    const tasks = get().tasks;
+
+    const task = tasks.find((x) => x.id === id);
+
+    tasks.map((task) => {
+      if (task.id == id) {
+        task.status = status;
+        return task;
+      }
+    });
+
+    console.log(tasks);
+
+    set({ tasks });
+
+    try {
+      const response = await axiosPrivate.put(
+        `task/${id}`,
+        JSON.stringify({
+          name: task.name,
+          description: task.description,
+          priority: task.priority,
+          status: task.status,
+          dateOn: task.dateOn,
+          dateOf: task.dateOf,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      set({ status: response?.status });
+    } catch (error) {
+      set({ status: error?.response?.status });
     }
   },
 }));

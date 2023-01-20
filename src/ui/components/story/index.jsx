@@ -4,16 +4,12 @@ import { Button } from "@lanaco/lnc-react-ui";
 import YesNoModal from "../../modals/YesNoModal";
 import { useRef } from "react";
 import CreateEditStoryModal from "../../modals/CreateEditStoryModal";
-import {
-  ButtonContainer,
-  ContentStoryDiv,
-  ContentSeparator,
-  PriorityDiv,
-} from "../common-styles";
+import { ButtonContainer, ContentStoryDiv, ContentSeparator, PriorityDiv } from "../common-styles";
+import { useTranslation } from "react-i18next";
 
 const Story = (props) => {
-  const { priority, status, name, description, id, deleteStory, updateStory } =
-    props;
+  const { t } = useTranslation();
+  const { priority, status, name, description, id, deleteStory, updateStory } = props;
   const navigate = useNavigate();
   const deleteStoryModal = useRef();
   const editStoryModal = useRef();
@@ -35,7 +31,7 @@ const Story = (props) => {
       <CreateEditStoryModal
         cancel={() => editStoryModal.current.close()}
         ref={editStoryModal}
-        title="Edit Story"
+        title={t("editStory")}
         name={name}
         priority={priority}
         description={description}
@@ -47,13 +43,10 @@ const Story = (props) => {
         storyName={name}
         yesClicked={deleteStoryHandler}
         noClicked={() => deleteStoryModal.current.close()}
-        title={"Delete Story"}
-        description={`Are you sure to want delete story '${name}'`}
+        title={t("deleteStory")}
+        description={`${t("sureToDeleteStory")} '${name}'?`}
       />
-      <h3
-        onClick={() => navigate(`/story/${id}`)}
-        style={{ cursor: "pointer" }}
-      >
+      <h3 onClick={() => navigate(`/story/${id}`)} style={{ cursor: "pointer" }}>
         {name}
       </h3>
       <TitleSeparator />
@@ -70,7 +63,7 @@ const Story = (props) => {
         <Button
           onClick={() => editStoryModal.current.open()}
           color="success"
-          text="Detail"
+          text={t("detail")}
           style={{ marginTop: "10px" }}
         />
       </ButtonContainer>

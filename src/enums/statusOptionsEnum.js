@@ -1,19 +1,21 @@
+import i18next from "../localization/i18n";
+
 const statusOptions = [
   {
     value: "New",
-    label: "New",
+    label: i18next.t("new"),
   },
   {
     value: "Active",
-    label: "Active",
+    label: i18next.t("active"),
   },
   {
     value: "Resolved",
-    label: "Resolved",
+    label: i18next.t("resolved"),
   },
   {
     value: "Closed",
-    label: "Closed",
+    label: i18next.t("closed"),
   },
 ];
 

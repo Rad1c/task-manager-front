@@ -12,8 +12,10 @@ import priorityOptions from "../../enums/priorityOptionsEnum";
 import { validateTaskSchema } from "../../validation/validator";
 import { ErrorValidation } from "../components/common-styles";
 import { reverseDateString } from "../../utils/helper";
+import { useTranslation } from "react-i18next";
 
 const CreateEditTaskModal = React.forwardRef((props, ref) => {
+  const { t } = useTranslation();
   const [createEditError, setCreateEditError] = useState();
   const {
     title,
@@ -36,9 +38,7 @@ const CreateEditTaskModal = React.forwardRef((props, ref) => {
     newPriority: priority || priorityOptions[0].value,
     newName: name,
     newDescription: description,
-    newDateOn: dateOn
-      ? reverseDateString(dateOn)
-      : reverseDateString(new Date().toISOString()),
+    newDateOn: dateOn ? reverseDateString(dateOn) : reverseDateString(new Date().toISOString()),
     newDateOf: dateOf && reverseDateString(dateOf),
   });
 
@@ -53,10 +53,10 @@ const CreateEditTaskModal = React.forwardRef((props, ref) => {
       storyId,
     };
 
-    console.log(data);
-
     try {
-      await validateTaskSchema.validate(data);
+      const valid = await validateTaskSchema.validate(data);
+
+      console.log(valid);
 
       if (create) {
         create({ ...data, storyId });
@@ -65,6 +65,7 @@ const CreateEditTaskModal = React.forwardRef((props, ref) => {
       if (update) {
         update(data);
       }
+
       setCreateEditError("");
     } catch (err) {
       setCreateEditError(err.errors);
@@ -82,25 +83,21 @@ const CreateEditTaskModal = React.forwardRef((props, ref) => {
             <ErrorValidation>{createEditError}</ErrorValidation>
           </div>
           <TextInput
-            placeholder="Name"
+            placeholder={t("name")}
             value={name}
             onChange={(e) => (formValuesRef.current.newName = e.target.value)}
           />
           <DateInput
             size="small"
             format="yyyy-MM-DD"
-            onChange={(_, d) =>
-              (formValuesRef.current.newDateOn = d.slice(0, 10))
-            }
+            onChange={(_, d) => (formValuesRef.current.newDateOn = d.slice(0, 10))}
             value={formValuesRef.current.newDateOn}
           />
           <DateInput
             size="small"
             format="yyyy-MM-DD"
-            onChange={(_, d) =>
-              (formValuesRef.current.newDateOf = d.slice(0, 10))
-            }
-            value={formValuesRef.current.newDateOf}
+            onChange={(_, d) => (formValuesRef.current.newDateOf = d.slice(0, 10))}
+            value={dateOf && formValuesRef.current.newDateOf}
           />
           <Dropdown
             size="small"
@@ -119,16 +116,14 @@ const CreateEditTaskModal = React.forwardRef((props, ref) => {
             maxRows={15}
             style={{ width: "420px" }}
             value={description}
-            onChange={(e) =>
-              (formValuesRef.current.newDescription = e.target.value)
-            }
+            onChange={(e) => (formValuesRef.current.newDescription = e.target.value)}
           />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button color="danger" onClick={cancel}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button color="success" onClick={onSaveHandler}>
-              Save
+              {t("save")}
             </Button>
           </div>
         </>

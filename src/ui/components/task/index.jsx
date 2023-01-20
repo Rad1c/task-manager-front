@@ -1,28 +1,24 @@
-import {
-  ButtonContainer,
-  Separator,
-  ContentStoryDiv,
-  PriorityDiv,
-} from "../common-styles";
+import { ButtonContainer, Separator, ContentStoryDiv, PriorityDiv } from "../common-styles";
 import { Button } from "@lanaco/lnc-react-ui";
 import DateRange from "../date-range";
 import YesNoModal from "../../modals/YesNoModal";
 import { useRef } from "react";
 import CreateEditTaskModal from "../../modals/CreateEditTaskModal";
+import { useTranslation } from "react-i18next";
 
-const Task = (props) => {
-  const {
-    id,
-    storyId,
-    priority,
-    name,
-    description,
-    status,
-    dateOn,
-    dateOf,
-    deleteTask,
-    updateTask,
-  } = props;
+const Task = ({
+  id,
+  storyId,
+  priority,
+  name,
+  description,
+  status,
+  dateOn,
+  dateOf,
+  deleteTask,
+  updateTask,
+}) => {
+  const { t } = useTranslation();
   const deleteTaskModalRef = useRef();
   const editTaskModalRef = useRef();
 
@@ -55,8 +51,8 @@ const Task = (props) => {
         taskName={name}
         yesClicked={deleteTaskHandler}
         noClicked={() => deleteTaskModalRef.current.close()}
-        title={"Delete Task"}
-        description={`Are you sure to want delete task '${name}'`}
+        title={t("deleteTask")}
+        description={`${t("sureToDeleteTask")} '${name}'?`}
       />
       <h3>{name}</h3>
       <Separator />
@@ -74,7 +70,7 @@ const Task = (props) => {
         <Button
           color="success"
           onClick={() => editTaskModalRef.current.open()}
-          text="Detail"
+          text={t("detail")}
           style={{ marginTop: "10px" }}
         />
       </ButtonContainer>

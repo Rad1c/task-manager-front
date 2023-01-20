@@ -7,12 +7,11 @@ import { ErrorValidation } from "../common-styles";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useLoginStore from "../../../store/loginStore";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const LoginForm = () => {
   const { isUserLoggedIn, login, loginErrors } = useLoginStore();
-  // const navigate = useNavigate();
-  // const location = useLocation();
-  // const from = location.state?.from?.pathname || "/";
+  const { t } = useTranslation();
 
   const {
     register,
@@ -35,10 +34,8 @@ const LoginForm = () => {
       exit={{ opacity: 0, transition: { ease: "easeInOut" } }}
     >
       <Form onSubmit={handleSubmit(submitForm)}>
-        <Label>Login</Label>
-        {loginErrors && (
-          <ErrorLabel id="error-message">{loginErrors}</ErrorLabel>
-        )}
+        <Label>{t("loginTitle")}</Label>
+        {loginErrors && <ErrorLabel id="error-message">{loginErrors}</ErrorLabel>}
         <TextInput
           name="email"
           placeholder="Email"
@@ -49,18 +46,14 @@ const LoginForm = () => {
         <ErrorValidation>{errors.email?.message}</ErrorValidation>
         <PasswordInput
           name="password"
-          placeholder="Password"
+          placeholder={t("password")}
           {...register("password")}
           value="0000"
         />
         <ErrorValidation>{errors.password?.message}</ErrorValidation>
-        <Button
-          type="submit"
-          text="Login"
-          style={{ width: "100%", marginTop: "10px" }}
-        />
+        <Button type="submit" text={t("login")} style={{ width: "100%", marginTop: "10px" }} />
         <LinkTo>
-          <Link to="/register">Create an account</Link>
+          <Link to="/register">{t("newAcc")}</Link>
         </LinkTo>
       </Form>
     </motion.div>

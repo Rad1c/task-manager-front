@@ -1,20 +1,17 @@
-import {
-  ConfirmationForm,
-  Dropdown,
-  TextAreaInput,
-  TextInput,
-} from "@lanaco/lnc-react-ui";
+import { ConfirmationForm, Dropdown, TextAreaInput, TextInput } from "@lanaco/lnc-react-ui";
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@lanaco/lnc-react-ui";
 import priorityOptions from "../../enums/priorityOptionsEnum";
 import statusOptions from "../../enums/statusOptionsEnum";
 import { validateStorySchema } from "../../validation/validator";
 import { ErrorValidation } from "../components/common-styles";
+import { useTranslation } from "react-i18next";
 
 const CreateEditStoryModal = React.forwardRef((props, ref) => {
+  const { t } = useTranslation();
   const [createEditError, setCreateEditError] = useState();
-  const { title, cancel, create, status, priority, description, name, update } =
-    props;
+  const { title, cancel, create, status, priority, description, name, update } = props;
+
   const formValuesRef = useRef({
     newStatus: status || statusOptions[0].value,
     newPriority: priority || priorityOptions[0].value,
@@ -23,8 +20,7 @@ const CreateEditStoryModal = React.forwardRef((props, ref) => {
   });
 
   const onSaveHandler = async () => {
-    const { newStatus, newPriority, newName, newDescription } =
-      formValuesRef.current;
+    const { newStatus, newPriority, newName, newDescription } = formValuesRef.current;
 
     const data = {
       name: newName,
@@ -60,20 +56,20 @@ const CreateEditStoryModal = React.forwardRef((props, ref) => {
             <ErrorValidation>{createEditError}</ErrorValidation>
           </div>
           <TextInput
-            placeholder="Name"
+            placeholder={t("name")}
             value={name}
             onChange={(e) => (formValuesRef.current.newName = e.target.value)}
           />
           <Dropdown
-            size="small"
+            size="medium"
             options={priorityOptions}
-            defaultInputValue={priority || priorityOptions[0].value}
+            defaultInputValue={priority || priorityOptions[0].label}
             onChange={(e) => (formValuesRef.current.newPriority = e.value)}
           />
           <Dropdown
             size="small"
             options={status ? statusOptions : [statusOptions[0]]}
-            defaultInputValue={status || statusOptions[0].value}
+            defaultInputValue={status || statusOptions[0].label}
             onChange={(e) => (formValuesRef.current.newStatus = e.value)}
           />
           <TextAreaInput
@@ -81,16 +77,14 @@ const CreateEditStoryModal = React.forwardRef((props, ref) => {
             maxRows={12}
             style={{ width: "350px" }}
             value={description}
-            onChange={(e) =>
-              (formValuesRef.current.newDescription = e.target.value)
-            }
+            onChange={(e) => (formValuesRef.current.newDescription = e.target.value)}
           />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button color="danger" onClick={cancel}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button color="success" onClick={onSaveHandler}>
-              Save
+              {t("save")}
             </Button>
           </div>
         </>

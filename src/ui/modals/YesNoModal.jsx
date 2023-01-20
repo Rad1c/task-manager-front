@@ -1,9 +1,11 @@
 import { ConfirmationForm } from "@lanaco/lnc-react-ui";
 import React from "react";
 import { Button } from "@lanaco/lnc-react-ui";
+import { useTranslation } from "react-i18next";
 
 const YesNoModal = React.forwardRef((props, ref) => {
   const { yesClicked, noClicked, title, description } = props;
+  const { t } = useTranslation();
 
   return (
     <ConfirmationForm
@@ -13,9 +15,9 @@ const YesNoModal = React.forwardRef((props, ref) => {
       actions={
         <>
           <Button color={"danger"} onClick={yesClicked}>
-            Yes
+            {t("yes")}
           </Button>
-          <Button onClick={noClicked}>No</Button>
+          <Button onClick={noClicked}>{t("no")}</Button>
         </>
       }
       title={title}
